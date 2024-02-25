@@ -5,6 +5,7 @@ import {Button, Form, Input, message} from "antd";
 import {useNavigate} from "react-router-dom";
 import {isMobile} from "../helper";
 import {useEffect, useState} from "react";
+import {verifyLoginStatus} from "./List";
 
 export const getUserInfo = async () => {
     try {
@@ -58,13 +59,11 @@ const Login = () => {
 
     //如果缓存有Token，就获取用户信息，获取成功就跳转到列表页
     useEffect(() => {
-        if (localStorage.getItem('Token')) {
-            getUserInfo().then((success) => {
-                success && navigate('/list');
-                success && message.success('您已登录', 1);
-            });
-        }
-    }, [navigate]);
+        verifyLoginStatus().then((susccess) => {
+            susccess && navigate('/list');
+        });
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <div

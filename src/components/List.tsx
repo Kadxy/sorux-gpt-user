@@ -3,7 +3,7 @@
 import {API, showError} from "../api/api";
 import React, {useEffect, useState} from "react";
 import {Avatar, Button, Card, Col, Form, Input, message, Modal, Row, Space, Tag} from "antd";
-import {ListResponse} from "../types/sorux-types";
+import {ListResponse, VerifyLoginStatusResponse} from "../types/sorux-types";
 import {OpenAIOutlined} from "@ant-design/icons";
 import {getUserInfo} from "./Login";
 import {ProList} from '@ant-design/pro-components';
@@ -11,15 +11,28 @@ import {useNavigate} from "react-router-dom";
 import {isMobile} from "../helper";
 
 const {Meta} = Card;
-const List = () => {
 
-    //检查 localStorage 是否有 Token和AccessToken，没有就跳转到登录页
-    useEffect(() => {
-        if (!localStorage.getItem('Token') || !localStorage.getItem('AccessToken')) {
-            message.error('登录信息失效，请重新登录');
-            navigate('/login');
+export const verifyLoginStatus = async () => {
+    try {
+        const res = await API.post(`/api/node/refresh?token=${localStorage.getItem('Token')}`);
+        const {StatusCode} = res.data as VerifyLoginStatusResponse;
+        if (StatusCode === 0) {
+            console.log('登录状态有效');
+            return true;
+        } else {
+            message.error('登录过期，请重新登录');
+            console.log('登录状态无效', res);
+            localStorage.clear();
+            window.location.href = '/login';
+            return false;
         }
-    }, []);
+    } catch (e) {
+        showError(e);
+        return false;
+    }
+}
+
+const List = () => {
 
     const [form] = Form.useForm();
     const navigate = useNavigate();
@@ -36,6 +49,11 @@ const List = () => {
         await API.post('/api/user/logout')
         localStorage.clear();
         navigate('/login');
+    }
+
+    const handelClickLink = async (link: string) => {
+        if (!await verifyLoginStatus()) return;
+        window.open(`https://${link}/logintoken?access_token=${localStorage.getItem('AccessToken')}`);
     }
 
     const onResetPasswordFinish = async (values: any) => {
@@ -145,7 +163,7 @@ const List = () => {
                                             <a
                                                 key="link"
                                                 type={'link'}
-                                                href={`https://${row.link}/logintoken?access token=${localStorage.getItem('AccessToken')}`}
+                                                onClick={() => handelClickLink(row.link)}
                                                 target="_blank"
                                                 rel="noreferrer"
                                             >

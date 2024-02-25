@@ -81,3 +81,10 @@ export type UserInfoResponse = {
         Email: string;
     }
 }
+
+// {"StatusCode":0,"StatusMsg":"success"}
+
+export type VerifyLoginStatusResponse = {
+    StatusCode: number;
+    StatusMsg: string;
+}
