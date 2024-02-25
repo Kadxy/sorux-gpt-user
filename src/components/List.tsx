@@ -12,6 +12,15 @@ import {isMobile} from "../helper";
 
 const {Meta} = Card;
 const List = () => {
+
+    //检查 localStorage 是否有 Token和AccessToken，没有就跳转到登录页
+    useEffect(() => {
+        if (!localStorage.getItem('Token') || !localStorage.getItem('AccessToken')) {
+            message.error('登录信息失效，请重新登录');
+            navigate('/login');
+        }
+    }, []);
+
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [lists, setLists] = useState<any[]>([] as ListResponse['data']);
@@ -136,7 +145,7 @@ const List = () => {
                                             <a
                                                 key="link"
                                                 type={'link'}
-                                                href={`https://${row.link}?token=${localStorage.getItem('Token')}`}
+                                                href={`https://${row.link}/logintoken?access token=${localStorage.getItem('AccessToken')}`}
                                                 target="_blank"
                                                 rel="noreferrer"
                                             >
