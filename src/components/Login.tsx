@@ -59,8 +59,8 @@ const Login = () => {
 
     //如果缓存有Token，就获取用户信息，获取成功就跳转到列表页
     useEffect(() => {
-        verifyLoginStatus().then((susccess) => {
-            susccess && navigate('/list');
+        verifyLoginStatus().then((success) => {
+            success && navigate('/list');
         });
         // eslint-disable-next-line
     }, []);
